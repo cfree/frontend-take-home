@@ -1,0 +1,2 @@
+# Full gate before sharing code: types, lint, and the test suite.
+cd client && pnpm typecheck && pnpm lint && pnpm test

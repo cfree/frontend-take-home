@@ -1,0 +1,33 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start All",
+      "detail": "Start UI and API",
+      "dependsOn": ["Start API", "Start UI"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Start API",
+      "type": "shell",
+      "command": "npm run api",
+      "problemMatcher": [],
+      "detail": "Start the API server on port 3002",
+      "options": {
+        "cwd": "${workspaceFolder}/server"
+      },
+      "isBackground": true
+    },
+    {
+      "label": "Start UI",
+      "type": "shell",
+      "command": "pnpm dev",
+      "problemMatcher": [],
+      "detail": "Build and serve the UI on port 5173",
+      "options": {
+        "cwd": "${workspaceFolder}/client"
+      },
+      "isBackground": true
+    }
+  ]
+}
