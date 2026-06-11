@@ -13,7 +13,13 @@ import "./index.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <Theme>
+    <Theme
+      appearance="light"
+      accentColor="iris"
+      grayColor="slate"
+      radius="medium"
+      scaling="100%"
+    >
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           {/* Placeholder route. The real /users + /roles route tree gets
