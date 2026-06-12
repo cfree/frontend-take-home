@@ -1,6 +1,6 @@
-import type { FC } from "react";
-import { useUsers } from "~/hooks/useUsers";
-import { useRolesMap } from "~/hooks/useRoles";
+import { useRef, type FC } from "react";
+import { useUsers } from "~/api/users/useUsers";
+import { useRolesMap } from "~/api/roles/useRoles";
 import { ResultsAnnouncer } from "~/components/ResultsAnnouncer";
 import { UsersTable } from "./UsersTable";
 
@@ -24,10 +24,27 @@ export const UsersList: FC<UsersTableProps> = ({ search }) => {
       ? usersQuery.data.data.length
       : null;
 
+  // A stable, always-present focus anchor wrapping the table body. After a
+  // delete removes a row, focus moves here so it isn't lost to the page body
+  // when the row unmounts; the region label keeps the landing place meaningful.
+  const focusAnchorRef = useRef<HTMLDivElement>(null);
+
   return (
     <>
       <ResultsAnnouncer count={settledCount} noun="user" />
-      <UsersTable usersQuery={usersQuery} rolesMap={rolesMap} />
+      <div
+        ref={focusAnchorRef}
+        role="region"
+        aria-label="Users table"
+        tabIndex={-1}
+        style={{ outline: "none" }}
+      >
+        <UsersTable
+          usersQuery={usersQuery}
+          rolesMap={rolesMap}
+          focusAnchorRef={focusAnchorRef}
+        />
+      </div>
     </>
   );
 };

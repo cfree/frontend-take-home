@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
-import type { Role } from "~/api/roles";
-import type { User } from "~/api/users";
+import type { Role } from "~/api/roles/types";
+import type { User } from "~/api/users/types";
 
 // Faker-backed test data builders. Each accepts overrides so a test can pin the
 // fields it asserts on (names, role ids, join dates) while the rest stay

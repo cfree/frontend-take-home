@@ -1,13 +1,13 @@
-import type { FC } from "react";
+import type { FC, RefObject } from "react";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { Table, Text, VisuallyHidden } from "@radix-ui/themes";
 import dayjs from "dayjs";
-import type { UsersPage } from "~/api/users";
+import type { UsersPage } from "~/api/users/types";
 import { DATE_FORMAT } from "~/lib/constants";
 import { EmptyState } from "~/components/EmptyState";
 import { ErrorState } from "~/components/ErrorState";
-import { RowActionsMenu } from "~/components/RowActionsMenu";
 import { UserCell } from "~/components/UserCell";
+import { UserRowActions } from "./UserRowActions";
 import { UsersTableSkeleton } from "./UsersTableSkeleton";
 
 interface UsersTableProps {
@@ -16,13 +16,20 @@ interface UsersTableProps {
   // the loading/error/success narrowing intact here.
   usersQuery: UseQueryResult<UsersPage>;
   rolesMap: UseQueryResult<Map<string, string>>;
+  // Stable focus anchor in the table region, passed to each row's actions so
+  // focus survives a deleted row unmounting.
+  focusAnchorRef: RefObject<HTMLElement | null>;
 }
 
 // Presentational body of the Users table: resolves the four states from the
 // queries it's handed and renders the rows, mapping each user's `roleId` to its
 // display name. Loading and error are gated on both queries — one skeleton until
 // both resolve, one inline error if either fails.
-export const UsersTable: FC<UsersTableProps> = ({ usersQuery, rolesMap }) => {
+export const UsersTable: FC<UsersTableProps> = ({
+  usersQuery,
+  rolesMap,
+  focusAnchorRef,
+}) => {
   if (usersQuery.isPending || rolesMap.isPending) {
     return <UsersTableSkeleton />;
   }
@@ -51,7 +58,6 @@ export const UsersTable: FC<UsersTableProps> = ({ usersQuery, rolesMap }) => {
       </Table.Header>
       <Table.Body>
         {users.map((user) => {
-          const fullName = `${user.first} ${user.last}`;
           const roleName = rolesMap.data.get(user.roleId);
           return (
             <Table.Row key={user.id}>
@@ -63,7 +69,7 @@ export const UsersTable: FC<UsersTableProps> = ({ usersQuery, rolesMap }) => {
                 {dayjs(user.createdAt).format(DATE_FORMAT)}
               </Table.Cell>
               <Table.Cell>
-                <RowActionsMenu label={`Actions for ${fullName}`} />
+                <UserRowActions user={user} focusAnchorRef={focusAnchorRef} />
               </Table.Cell>
             </Table.Row>
           );

@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 
 import { server } from "~/test/server";
 import { buildRole, buildUser, pageOf } from "~/test/fixtures";
-import { renderWithProviders, screen, waitFor } from "~/test/utils";
+import { renderWithProviders, screen, waitFor, within } from "~/test/utils";
 import UsersTab from "./UsersTab";
 
 describe("UsersTab", () => {
@@ -30,7 +30,7 @@ describe("UsersTab", () => {
     expect(await screen.findByText("Administrator")).toBeInTheDocument();
   });
 
-  it("opens a row actions menu with disabled Edit and Delete items", async () => {
+  it("keeps the Edit user action disabled in the row actions menu", async () => {
     const user = buildUser({ first: "Ada", last: "Lovelace" });
     server.use(http.get("/api/users", () => HttpResponse.json(pageOf([user]))));
 
@@ -44,11 +44,236 @@ describe("UsersTab", () => {
     const editItem = await screen.findByRole("menuitem", {
       name: /edit user/i,
     });
-    const deleteItem = await screen.findByRole("menuitem", {
-      name: /delete user/i,
-    });
     expect(editItem).toHaveAttribute("aria-disabled", "true");
-    expect(deleteItem).toHaveAttribute("aria-disabled", "true");
+  });
+
+  it("opens a confirmation dialog naming the user when Delete is selected", async () => {
+    const user = buildUser({ first: "Ada", last: "Lovelace" });
+    server.use(http.get("/api/users", () => HttpResponse.json(pageOf([user]))));
+
+    renderWithProviders(<UsersTab />);
+    await screen.findByText("Ada Lovelace");
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /actions for ada lovelace/i }),
+    );
+    await userEvent.click(
+      await screen.findByRole("menuitem", { name: /delete user/i }),
+    );
+
+    const dialog = await screen.findByRole("alertdialog");
+    expect(
+      within(dialog).getByText("Delete Ada Lovelace?"),
+    ).toBeInTheDocument();
+  });
+
+  it("closes the dialog and returns focus to the row trigger on Cancel", async () => {
+    const user = buildUser({ first: "Ada", last: "Lovelace" });
+    server.use(http.get("/api/users", () => HttpResponse.json(pageOf([user]))));
+
+    renderWithProviders(<UsersTab />);
+    await screen.findByText("Ada Lovelace");
+
+    const trigger = screen.getByRole("button", {
+      name: /actions for ada lovelace/i,
+    });
+    await userEvent.click(trigger);
+    await userEvent.click(
+      await screen.findByRole("menuitem", { name: /delete user/i }),
+    );
+    await screen.findByRole("alertdialog");
+
+    await userEvent.click(screen.getByRole("button", { name: /cancel/i }));
+
+    await waitFor(() =>
+      expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument(),
+    );
+    expect(trigger).toHaveFocus();
+  });
+
+  it("dismisses the dialog with Escape and returns focus to the row trigger", async () => {
+    const user = buildUser({ first: "Ada", last: "Lovelace" });
+    server.use(http.get("/api/users", () => HttpResponse.json(pageOf([user]))));
+
+    renderWithProviders(<UsersTab />);
+    await screen.findByText("Ada Lovelace");
+
+    const trigger = screen.getByRole("button", {
+      name: /actions for ada lovelace/i,
+    });
+    await userEvent.click(trigger);
+    await userEvent.click(
+      await screen.findByRole("menuitem", { name: /delete user/i }),
+    );
+    await screen.findByRole("alertdialog");
+
+    await userEvent.keyboard("{Escape}");
+
+    await waitFor(() =>
+      expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument(),
+    );
+    expect(trigger).toHaveFocus();
+  });
+
+  it("deletes the user, removes the row, and shows a success toast on confirm", async () => {
+    const ada = buildUser({ first: "Ada", last: "Lovelace" });
+    const grace = buildUser({ first: "Grace", last: "Hopper" });
+    let remaining = [ada, grace];
+    server.use(
+      http.get("/api/users", () => HttpResponse.json(pageOf(remaining))),
+      http.delete("/api/users/:id", ({ params }) => {
+        remaining = remaining.filter((u) => u.id !== params.id);
+        return HttpResponse.json(ada);
+      }),
+    );
+
+    renderWithProviders(<UsersTab />);
+    await screen.findByText("Ada Lovelace");
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /actions for ada lovelace/i }),
+    );
+    await userEvent.click(
+      await screen.findByRole("menuitem", { name: /delete user/i }),
+    );
+    await userEvent.click(
+      await screen.findByRole("button", { name: /^delete$/i }),
+    );
+
+    // Success toast names the deleted user.
+    expect(
+      await screen.findByText("Ada Lovelace was deleted."),
+    ).toBeInTheDocument();
+    // The row reconciles away once the background refetch settles; Grace stays.
+    await waitFor(() =>
+      expect(screen.queryByText("Ada Lovelace")).not.toBeInTheDocument(),
+    );
+    expect(screen.getByText("Grace Hopper")).toBeInTheDocument();
+  });
+
+  it("moves focus to the table region after a successful delete", async () => {
+    const ada = buildUser({ first: "Ada", last: "Lovelace" });
+    const grace = buildUser({ first: "Grace", last: "Hopper" });
+    let remaining = [ada, grace];
+    server.use(
+      http.get("/api/users", () => HttpResponse.json(pageOf(remaining))),
+      http.delete("/api/users/:id", ({ params }) => {
+        remaining = remaining.filter((u) => u.id !== params.id);
+        return HttpResponse.json(ada);
+      }),
+    );
+
+    renderWithProviders(<UsersTab />);
+    await screen.findByText("Ada Lovelace");
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /actions for ada lovelace/i }),
+    );
+    await userEvent.click(
+      await screen.findByRole("menuitem", { name: /delete user/i }),
+    );
+    await userEvent.click(
+      await screen.findByRole("button", { name: /^delete$/i }),
+    );
+
+    await waitFor(() =>
+      expect(screen.queryByText("Ada Lovelace")).not.toBeInTheDocument(),
+    );
+    // Focus parks on a stable anchor in the table region rather than falling to
+    // the page body when the deleted row unmounts.
+    expect(screen.getByRole("region", { name: /users table/i })).toHaveFocus();
+  });
+
+  it("presents a busy state and blocks double-submit while the delete is in flight", async () => {
+    const ada = buildUser({ first: "Ada", last: "Lovelace" });
+    let deleteCount = 0;
+    server.use(
+      http.get("/api/users", () => HttpResponse.json(pageOf([ada]))),
+      http.delete("/api/users/:id", async () => {
+        deleteCount++;
+        await delay("infinite");
+        return HttpResponse.json(ada);
+      }),
+    );
+
+    renderWithProviders(<UsersTab />);
+    await screen.findByText("Ada Lovelace");
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /actions for ada lovelace/i }),
+    );
+    await userEvent.click(
+      await screen.findByRole("menuitem", { name: /delete user/i }),
+    );
+    const deleteButton = await screen.findByRole("button", {
+      name: /^delete$/i,
+    });
+    await userEvent.click(deleteButton);
+
+    // Both buttons present a busy/disabled state (aria, not native disabled, so
+    // focus survives), and the Delete button stays focused for instant retry.
+    await waitFor(() =>
+      expect(deleteButton).toHaveAttribute("aria-busy", "true"),
+    );
+    expect(deleteButton).toHaveAttribute("aria-disabled", "true");
+    expect(deleteButton).toHaveFocus();
+    expect(screen.getByRole("button", { name: /cancel/i })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+    // The dialog stays open while the request is outstanding.
+    expect(screen.getByRole("alertdialog")).toBeInTheDocument();
+
+    // A second click while in flight does not fire a second request.
+    await userEvent.click(deleteButton);
+    expect(deleteCount).toBe(1);
+  });
+
+  it("does not flash the loading skeleton during the post-delete refetch", async () => {
+    const ada = buildUser({ first: "Ada", last: "Lovelace" });
+    const grace = buildUser({ first: "Grace", last: "Hopper" });
+    let remaining = [ada, grace];
+    let getCount = 0;
+    server.use(
+      http.get("/api/users", async () => {
+        getCount += 1;
+        // Delay only the post-delete refetch so there's a real window in which
+        // a skeleton could wrongly appear.
+        if (getCount > 1) {
+          await delay(100);
+        }
+        return HttpResponse.json(pageOf(remaining));
+      }),
+      http.delete("/api/users/:id", ({ params }) => {
+        remaining = remaining.filter((u) => u.id !== params.id);
+        return HttpResponse.json(ada);
+      }),
+    );
+
+    renderWithProviders(<UsersTab />);
+    await screen.findByText("Ada Lovelace");
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /actions for ada lovelace/i }),
+    );
+    await userEvent.click(
+      await screen.findByRole("menuitem", { name: /delete user/i }),
+    );
+    await userEvent.click(
+      await screen.findByRole("button", { name: /^delete$/i }),
+    );
+
+    // Success fires and the refetch is in flight; the existing rows stay put and
+    // no loading skeleton appears (it's gated on no-data pending, not fetching).
+    await screen.findByText("Ada Lovelace was deleted.");
+    expect(
+      screen.queryByRole("status", { name: /loading/i }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText("Grace Hopper")).toBeInTheDocument();
+
+    await waitFor(() =>
+      expect(screen.queryByText("Ada Lovelace")).not.toBeInTheDocument(),
+    );
   });
 
   it("opens the row actions menu with the keyboard", async () => {
@@ -223,6 +448,190 @@ describe("UsersTab", () => {
     await screen.findByRole("alert");
 
     expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it("shows the empty state after the last user is deleted", async () => {
+    const ada = buildUser({ first: "Ada", last: "Lovelace" });
+    let remaining = [ada];
+    server.use(
+      http.get("/api/users", () => HttpResponse.json(pageOf(remaining))),
+      http.delete("/api/users/:id", ({ params }) => {
+        remaining = remaining.filter((u) => u.id !== params.id);
+        return HttpResponse.json(ada);
+      }),
+    );
+
+    renderWithProviders(<UsersTab />);
+    await screen.findByText("Ada Lovelace");
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /actions for ada lovelace/i }),
+    );
+    await userEvent.click(
+      await screen.findByRole("menuitem", { name: /delete user/i }),
+    );
+    await userEvent.click(
+      await screen.findByRole("button", { name: /^delete$/i }),
+    );
+
+    expect(await screen.findByText("No users found.")).toBeInTheDocument();
+  });
+
+  it("warns and reconciles when deleting a user that is already gone (404)", async () => {
+    const ada = buildUser({ first: "Ada", last: "Lovelace" });
+    let remaining = [ada];
+    server.use(
+      http.get("/api/users", () => HttpResponse.json(pageOf(remaining))),
+      http.delete("/api/users/:id", () => {
+        // The user was already removed on the server by someone else.
+        remaining = [];
+        return HttpResponse.json(
+          { message: "User not found" },
+          { status: 404 },
+        );
+      }),
+    );
+
+    renderWithProviders(<UsersTab />);
+    await screen.findByText("Ada Lovelace");
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /actions for ada lovelace/i }),
+    );
+    await userEvent.click(
+      await screen.findByRole("menuitem", { name: /delete user/i }),
+    );
+    await userEvent.click(
+      await screen.findByRole("button", { name: /^delete$/i }),
+    );
+
+    // Treated as a benign success: warning toast, dialog closes, row reconciles
+    // away, and no inline error traps the user.
+    expect(
+      await screen.findByText("No action taken, user not found."),
+    ).toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument(),
+    );
+    await waitFor(() =>
+      expect(screen.queryByText("Ada Lovelace")).not.toBeInTheDocument(),
+    );
+    expect(screen.queryByText(/something went wrong/i)).not.toBeInTheDocument();
+  });
+
+  it("keeps the dialog open with an inline error when the delete server-fails (500)", async () => {
+    const ada = buildUser({ first: "Ada", last: "Lovelace" });
+    server.use(
+      http.get("/api/users", () => HttpResponse.json(pageOf([ada]))),
+      http.delete(
+        "/api/users/:id",
+        () => new HttpResponse(null, { status: 500 }),
+      ),
+    );
+
+    renderWithProviders(<UsersTab />);
+    await screen.findByText("Ada Lovelace");
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /actions for ada lovelace/i }),
+    );
+    await userEvent.click(
+      await screen.findByRole("menuitem", { name: /delete user/i }),
+    );
+    const deleteButton = await screen.findByRole("button", {
+      name: /^delete$/i,
+    });
+    await userEvent.click(deleteButton);
+
+    // The dialog stays open and surfaces a shared, announced inline error.
+    const dialog = screen.getByRole("alertdialog");
+    expect(await within(dialog).findByRole("alert")).toHaveTextContent(
+      "Something went wrong. Please try again.",
+    );
+    // Both buttons are re-enabled so the user can retry or cancel.
+    expect(deleteButton).not.toHaveAttribute("aria-busy", "true");
+    expect(deleteButton).not.toHaveAttribute("aria-disabled", "true");
+    expect(screen.getByRole("button", { name: /cancel/i })).not.toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+    // Focus stays on Delete for an instant retry.
+    expect(deleteButton).toHaveFocus();
+  });
+
+  it("shows the same inline error when the delete hits a network failure", async () => {
+    const ada = buildUser({ first: "Ada", last: "Lovelace" });
+    server.use(
+      http.get("/api/users", () => HttpResponse.json(pageOf([ada]))),
+      http.delete("/api/users/:id", () => HttpResponse.error()),
+    );
+
+    renderWithProviders(<UsersTab />);
+    await screen.findByText("Ada Lovelace");
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /actions for ada lovelace/i }),
+    );
+    await userEvent.click(
+      await screen.findByRole("menuitem", { name: /delete user/i }),
+    );
+    const deleteButton = await screen.findByRole("button", {
+      name: /^delete$/i,
+    });
+    await userEvent.click(deleteButton);
+
+    const dialog = screen.getByRole("alertdialog");
+    expect(await within(dialog).findByRole("alert")).toHaveTextContent(
+      "Something went wrong. Please try again.",
+    );
+    expect(deleteButton).toHaveFocus();
+  });
+
+  it("has no accessibility violations with the inline error shown in the dialog", async () => {
+    const ada = buildUser({ first: "Ada", last: "Lovelace" });
+    server.use(
+      http.get("/api/users", () => HttpResponse.json(pageOf([ada]))),
+      http.delete(
+        "/api/users/:id",
+        () => new HttpResponse(null, { status: 500 }),
+      ),
+    );
+
+    renderWithProviders(<UsersTab />);
+    await screen.findByText("Ada Lovelace");
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /actions for ada lovelace/i }),
+    );
+    await userEvent.click(
+      await screen.findByRole("menuitem", { name: /delete user/i }),
+    );
+    await userEvent.click(
+      await screen.findByRole("button", { name: /^delete$/i }),
+    );
+
+    const dialog = screen.getByRole("alertdialog");
+    await within(dialog).findByRole("alert");
+
+    expect(await axe(dialog)).toHaveNoViolations();
+  });
+
+  it("has no accessibility violations with the confirmation dialog open", async () => {
+    const user = buildUser({ first: "Ada", last: "Lovelace" });
+    server.use(http.get("/api/users", () => HttpResponse.json(pageOf([user]))));
+
+    renderWithProviders(<UsersTab />);
+    await screen.findByText("Ada Lovelace");
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /actions for ada lovelace/i }),
+    );
+    await userEvent.click(
+      await screen.findByRole("menuitem", { name: /delete user/i }),
+    );
+    const dialog = await screen.findByRole("alertdialog");
+
+    expect(await axe(dialog)).toHaveNoViolations();
   });
 });
 

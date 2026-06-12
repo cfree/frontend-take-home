@@ -11,6 +11,7 @@ import { queryClient } from "./lib/queryClient";
 import "@radix-ui/themes/styles.css";
 import "./index.css";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+import { ToastProvider } from "./components/toast/ToastProvider";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -21,14 +22,16 @@ createRoot(document.getElementById("root")!).render(
       radius="medium"
       scaling="100%"
     >
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <ErrorBoundary>
-            <AppRoutes />
-          </ErrorBoundary>
-        </BrowserRouter>
-        <ReactQueryDevtools initialIsOpen={false} />
-      </QueryClientProvider>
+      <ToastProvider>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <ErrorBoundary>
+              <AppRoutes />
+            </ErrorBoundary>
+          </BrowserRouter>
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
+      </ToastProvider>
     </Theme>
   </StrictMode>,
 );

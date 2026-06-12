@@ -4,6 +4,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router";
 import { Theme } from "@radix-ui/themes";
 
+import { ToastProvider } from "~/components/toast/ToastProvider";
+
 // A fresh client per render with retries disabled, so error-state tests fail
 // fast instead of waiting on React Query's backoff.
 function createTestQueryClient() {
@@ -28,9 +30,11 @@ export function renderWithProviders(
   function AllProviders({ children }: { children: ReactNode }) {
     return (
       <Theme>
-        <QueryClientProvider client={createTestQueryClient()}>
-          <MemoryRouter initialEntries={[route]}>{children}</MemoryRouter>
-        </QueryClientProvider>
+        <ToastProvider>
+          <QueryClientProvider client={createTestQueryClient()}>
+            <MemoryRouter initialEntries={[route]}>{children}</MemoryRouter>
+          </QueryClientProvider>
+        </ToastProvider>
       </Theme>
     );
   }

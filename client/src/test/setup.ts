@@ -17,6 +17,15 @@ class ResizeObserverStub implements ResizeObserver {
 }
 globalThis.ResizeObserver = ResizeObserverStub;
 
+// jsdom doesn't implement the Pointer Capture API, which Radix's Toast swipe
+// handling probes on pointer events. No-op stubs keep those handlers from
+// throwing during user-event interactions.
+if (!Element.prototype.hasPointerCapture) {
+  Element.prototype.hasPointerCapture = () => false;
+  Element.prototype.setPointerCapture = () => {};
+  Element.prototype.releasePointerCapture = () => {};
+}
+
 // MSW is the network seam for every test. Fail on any unhandled request so a
 // missing handler surfaces loudly instead of silently hitting the real (flaky)
 // backend, and reset per-test overrides between tests.
