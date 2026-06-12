@@ -1,0 +1,55 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(./.env*)",
+      "Read(./.aws*)",
+      "Read(~/.ssh/**)",
+      "Edit(/eslint.config.js)",
+      "Edit(/eslint.config.ts)",
+      "Edit(/.prettierignore)",
+      "Edit(/.prettierrc.json)",
+      "Edit(/.eslintrc.config.js)",
+      "Edit(/pnpm-lock.yaml)",
+      "Edit(/tsconfig.*)",
+      "Edit(/vite.config.ts)",
+      "Edit(/server)"
+    ],
+    "allow": [
+      "Bash(pnpm install)",
+      "Bash(git add*)",
+      "Bash(git commit*)",
+      "Bash(git merge --ff-only*)",
+      "Bash(git worktree*)",
+      "Bash(gh label *)",
+      "Bash(gh repo *)",
+      "Bash(gh issue *)",
+      "Bash(pnpm typecheck *)",
+      "Bash(pnpm test *)",
+      "Bash(pnpm format *)",
+      "Bash(pnpm lint *)",
+      "Bash(cat *)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pnpm lint --silent"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pnpm typecheck"
+          }
+        ]
+      }
+    ]
+  }
+}
