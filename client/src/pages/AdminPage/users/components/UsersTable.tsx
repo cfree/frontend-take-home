@@ -1,22 +1,28 @@
+import type { FC } from "react";
+import type { UseQueryResult } from "@tanstack/react-query";
 import { Table, Text, VisuallyHidden } from "@radix-ui/themes";
 import dayjs from "dayjs";
-import { useUsers } from "~/hooks/useUsers";
-import { useRolesMap } from "~/hooks/useRoles";
+import type { UsersPage } from "~/api/users";
 import { DATE_FORMAT } from "~/lib/constants";
-import { EmptyState } from "./EmptyState";
-import { ErrorState } from "./ErrorState";
-import { RowActionsMenu } from "./RowActionsMenu";
-import { UserCell } from "./UserCell";
+import { EmptyState } from "~/components/EmptyState";
+import { ErrorState } from "~/components/ErrorState";
+import { RowActionsMenu } from "~/components/RowActionsMenu";
+import { UserCell } from "~/components/UserCell";
 import { UsersTableSkeleton } from "./UsersTableSkeleton";
 
-// The Users table. Fetches users and roles through typed query hooks and
-// renders the first page, resolving each user's role to its name. The loading
-// and error states are gated on both queries: one skeleton until both resolve,
-// one inline error if either fails.
-export function UsersTable() {
-  const usersQuery = useUsers();
-  const rolesMap = useRolesMap();
+interface UsersTableProps {
+  // The users and resolved-roles queries, owned and passed down by the
+  // container so the data is fetched once. Their discriminated-union types keep
+  // the loading/error/success narrowing intact here.
+  usersQuery: UseQueryResult<UsersPage>;
+  rolesMap: UseQueryResult<Map<string, string>>;
+}
 
+// Presentational body of the Users table: resolves the four states from the
+// queries it's handed and renders the rows, mapping each user's `roleId` to its
+// display name. Loading and error are gated on both queries — one skeleton until
+// both resolve, one inline error if either fails.
+export const UsersTable: FC<UsersTableProps> = ({ usersQuery, rolesMap }) => {
   if (usersQuery.isPending || rolesMap.isPending) {
     return <UsersTableSkeleton />;
   }
@@ -65,4 +71,4 @@ export function UsersTable() {
       </Table.Body>
     </Table.Root>
   );
-}
+};

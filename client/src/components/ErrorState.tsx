@@ -1,8 +1,7 @@
 import { Callout } from "@radix-ui/themes";
 
 // Reusable inline error state for an async surface. `role="alert"` so assistive
-// tech announces it. Deliberately offers no manual retry control — the query
-// client retries automatically against the flaky backend.
+// tech announces it.
 export function ErrorState({
   message = "Something went wrong.",
 }: {

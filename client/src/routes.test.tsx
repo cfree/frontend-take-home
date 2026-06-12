@@ -51,13 +51,19 @@ describe("admin routing", () => {
   it("renders the Users screen in the layout outlet", () => {
     renderWithProviders(<AppRoutes />, { route: "/users" });
 
-    expect(screen.getByRole("heading", { name: "Users" })).toBeInTheDocument();
+    // The search toolbar is distinctive to the Users screen, so finding it
+    // confirms that route rendered into the outlet.
+    expect(
+      screen.getByRole("searchbox", { name: /search users/i }),
+    ).toBeInTheDocument();
   });
 
   it("renders the Roles screen in the layout outlet", () => {
     renderWithProviders(<AppRoutes />, { route: "/roles" });
 
-    expect(screen.getByRole("heading", { name: "Roles" })).toBeInTheDocument();
+    expect(
+      screen.getByText(/role management is coming soon/i),
+    ).toBeInTheDocument();
   });
 
   it("has no accessibility violations", async () => {
