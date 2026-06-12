@@ -1,4 +1,4 @@
-import { Container, Flex, Heading, TabNav } from "@radix-ui/themes";
+import { Container, Flex, TabNav } from "@radix-ui/themes";
 import { Link, Outlet, useLocation } from "react-router";
 
 // The admin area's tab destinations. The URL is the single source of truth for
@@ -15,9 +15,8 @@ export function AdminLayout() {
   const { pathname } = useLocation();
 
   return (
-    <Container size="3" p="6">
+    <Container size="2" p="6">
       <Flex direction="column" gap="4">
-        <Heading size="6">Admin</Heading>
         <TabNav.Root aria-label="Admin sections">
           {TABS.map((tab) => (
             <TabNav.Link

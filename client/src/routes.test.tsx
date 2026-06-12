@@ -1,6 +1,6 @@
 import { axe } from "vitest-axe";
 import userEvent from "@testing-library/user-event";
-import { AppRoutes } from "./routes";
+import AppRoutes from "./routes";
 import { renderWithProviders, screen } from "./test/utils";
 
 describe("admin routing", () => {

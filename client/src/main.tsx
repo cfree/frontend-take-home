@@ -5,11 +5,12 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { BrowserRouter } from "react-router";
 import { Theme } from "@radix-ui/themes";
 
-import { AppRoutes } from "./routes";
+import AppRoutes from "./routes";
 import { queryClient } from "./lib/queryClient";
 
 import "@radix-ui/themes/styles.css";
 import "./index.css";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -22,7 +23,9 @@ createRoot(document.getElementById("root")!).render(
     >
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
-          <AppRoutes />
+          <ErrorBoundary>
+            <AppRoutes />
+          </ErrorBoundary>
         </BrowserRouter>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
