@@ -60,7 +60,3 @@ A pre-commit hook formats and lints staged files. A pre-push hook runs type chec
 - **ESLint, Prettier, and jsx-a11y** for code consistency and preventing accessibility issues.
 - **dayjs** for easy date formatting.
 - **lodash.debounce** for preventing race conditions and API hammering.
-
-## Notes
-
-This is the scaffold. The route tree and the actual Users and Roles features get built on top of it. dayjs and lodash.debounce are installed for date formatting and search debouncing once those features land.
