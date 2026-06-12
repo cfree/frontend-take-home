@@ -1,6 +1,7 @@
 import type { ReactElement, ReactNode } from "react";
 import { render, type RenderOptions } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { MemoryRouter } from "react-router";
 import { Theme } from "@radix-ui/themes";
 
 // A fresh client per render with retries disabled, so error-state tests fail
@@ -11,22 +12,29 @@ function createTestQueryClient() {
   });
 }
 
-function AllProviders({ children }: { children: ReactNode }) {
-  return (
-    <Theme>
-      <QueryClientProvider client={createTestQueryClient()}>
-        {children}
-      </QueryClientProvider>
-    </Theme>
-  );
-}
+type ProviderOptions = Omit<RenderOptions, "wrapper"> & {
+  // Initial URL the in-memory router lands on, so routed components (and
+  // deep-link / redirect behavior) can be exercised in tests.
+  route?: string;
+};
 
-// Render a component wrapped in the app's providers. Add a router wrapper here
-// once components start using React Router hooks.
+// Render a component wrapped in the app's providers: the Radix theme, a no-retry
+// React Query client, and an in-memory router so components using routing hooks
+// render in isolation.
 export function renderWithProviders(
   ui: ReactElement,
-  options?: Omit<RenderOptions, "wrapper">,
+  { route = "/", ...options }: ProviderOptions = {},
 ) {
+  function AllProviders({ children }: { children: ReactNode }) {
+    return (
+      <Theme>
+        <QueryClientProvider client={createTestQueryClient()}>
+          <MemoryRouter initialEntries={[route]}>{children}</MemoryRouter>
+        </QueryClientProvider>
+      </Theme>
+    );
+  }
+
   return render(ui, { wrapper: AllProviders, ...options });
 }
 

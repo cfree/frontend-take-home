@@ -1,0 +1,5 @@
+# MSW's only build script is a postinstall that copies the browser service
+# worker into a public dir. We use MSW's Node integration (`msw/node`) for tests
+# and never run it in the browser, so the worker isn't needed — skip the build.
+allowBuilds:
+  msw: false
