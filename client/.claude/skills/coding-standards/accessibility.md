@@ -16,4 +16,4 @@ Accessibility is an explicit evaluation criterion — treat it as a requirement,
 - [ ] Every control has an accessible name (especially icon-only buttons).
 - [ ] Dynamic results are announced.
 - [ ] `pnpm lint` clean (no jsx-a11y warnings).
-- [ ] An axe assertion covers the component.
+- [ ] An axe assertion covers the component (if one doesn't already exist).

@@ -15,18 +15,18 @@
       "Edit(/server)"
     ],
     "allow": [
-      "Bash(pnpm install)",
-      "Bash(git add*)",
-      "Bash(git commit*)",
+      "Bash(pnpm add *)",
+      "Bash(pnpm typecheck *)",
+      "Bash(pnpm test *)",
+      "Bash(pnpm format *)",
+      "Bash(pnpm lint *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
       "Bash(git merge --ff-only*)",
       "Bash(git worktree*)",
       "Bash(gh label *)",
       "Bash(gh repo *)",
       "Bash(gh issue *)",
-      "Bash(pnpm typecheck *)",
-      "Bash(pnpm test *)",
-      "Bash(pnpm format *)",
-      "Bash(pnpm lint *)",
       "Bash(cat *)"
     ]
   },

@@ -23,12 +23,3 @@ dist-ssr
 *.sln
 *.sw?
 
-# Agentic Engineering
-.scratch/
-.claude/
-CLAUDE.md
-AGENTS.md
-
-# excluded for now
-docs/ 
-
