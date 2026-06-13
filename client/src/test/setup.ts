@@ -26,6 +26,13 @@ if (!Element.prototype.hasPointerCapture) {
   Element.prototype.releasePointerCapture = () => {};
 }
 
+// jsdom doesn't implement <canvas>; axe-core's color-contrast rule probes
+// getContext() to sample background colors. Stub it to null so the check
+// short-circuits quietly instead of spamming "Not implemented" to stderr.
+// (Contrast can't be evaluated under jsdom regardless — no layout engine.)
+HTMLCanvasElement.prototype.getContext = (() =>
+  null) as typeof HTMLCanvasElement.prototype.getContext;
+
 // MSW is the network seam for every test. Fail on any unhandled request so a
 // missing handler surfaces loudly instead of silently hitting the real (flaky)
 // backend, and reset per-test overrides between tests.
