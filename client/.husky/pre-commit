@@ -1,0 +1,2 @@
+# Fast gate: format + lint only the staged files in the client project.
+cd client && pnpm lint-staged

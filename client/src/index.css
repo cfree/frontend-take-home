@@ -1,0 +1,14 @@
+/*
+ * Radix Themes ships its own CSS reset, scoped to the `.radix-themes` root that
+ * <Theme> renders. The only globals we need are the document-level bits that
+ * scoped reset doesn't own.
+ */
+body {
+  margin: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
