@@ -40,7 +40,7 @@ export const DeleteUserDialog: FC<DeleteUserDialogProps> = ({
 
   return (
     <AlertDialog.Root open={open} onOpenChange={onOpenChange}>
-      <AlertDialog.Content maxWidth="400px" onCloseAutoFocus={onCloseAutoFocus}>
+      <AlertDialog.Content maxWidth="536px" onCloseAutoFocus={onCloseAutoFocus}>
         <AlertDialog.Title>Delete user</AlertDialog.Title>
         <AlertDialog.Description>
           Are you sure? The user <strong>{fullName}</strong> will be permanently

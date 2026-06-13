@@ -61,3 +61,27 @@ A pre-commit hook formats and lints staged files. A pre-push hook runs type chec
 - **dayjs** for easy date formatting.
 - **lodash.debounce** for preventing race conditions and API hammering.
 - **@radix-ui/react-icons** for the row actions kebab glyph.
+
+## Agentic guardrails
+
+AI accelerated (component scaffolding, test boilerplate, repetitive MSW handlers), but I owned the architecture, the data-fetch pattern, the accessibility model, UX tradeoffs. I encoded my own standards into machine-checkable form and made the agent follow them:
+
+- Claude settings include allow/deny permissions and hooks to prevent agents from calling tasks complete without first checking linting and type checking
+- Git hooks (pre-commit formats/lints, pre-push runs typecheck + lint + tests) — AI output had to pass the same gate mine would
+- `.claude/skills/coding-standards/` [custom skill](./claude/skills/coding-standards) — backend (never touch server/), Zod-validated data-fetch pattern, accessibility as a top concern, testing conventions
+- Bundled select [skills from Matt Pocock](https://github.com/mattpocock/skills) I like to build with (specifically `/grill-me`, `/to-issues`, `/tdd`, and `/handoff`)
+
+## Things I would improve/do differently
+
+- **Pagination** — spec'd out but cut for time. Significant gap since the API returns
+  10 items by default. Would use URL query params (`?page=2`) with an out-of-range
+  redirect rather than a 404.
+- **Loading state visual instability** — action buttons shift size during loading.
+  Fix is to render them disabled during the request rather than swapping in a spinner,
+  then close and show a success toast on resolve.
+- **Status code mapping** — 400/404/500 logic is duplicated across mutations and
+  components. A small mapper would centralize it and make error messages consistent.
+- **Test coverage** — critical paths covered but not exhaustive. Would add Playwright
+  for keyboard navigation and modal focus trap testing specifically.
+- **i18n** — assistive tech benefits from properly localized strings. Would add
+  react-i18next as a foundation.
