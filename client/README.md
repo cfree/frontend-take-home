@@ -73,6 +73,7 @@ AI accelerated (component scaffolding, test boilerplate, repetitive MSW handlers
 
 ## Things I would improve/do differently
 
+- **Complete the design** - I excluded parts of the design that would have confused users if they were not completed, ('Add user' button, 'Edit user' action menu link, etc.). Given more time, I would complete those features
 - **Pagination** — spec'd out but cut for time. Significant gap since the API returns
   10 items by default. Would use URL query params (`?page=2`) with an out-of-range
   redirect rather than a 404.
