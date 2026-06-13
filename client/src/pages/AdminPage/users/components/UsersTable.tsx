@@ -18,14 +18,9 @@ import { UserCell } from "./UserCell";
 import { UserRowActions } from "./UserRowActions";
 import RowCell from "~/components/RowCell";
 
-// How many placeholder rows to show while loading — enough to read as "a table
-// is loading here" without dominating the viewport.
 const SKELETON_ROW_COUNT = 5;
 
 interface UsersTableProps {
-  // The users and resolved-roles queries, owned and passed down by the
-  // container so the data is fetched once. Their discriminated-union types keep
-  // the loading/error/success narrowing intact here.
   usersQuery: UseQueryResult<UsersPage>;
   rolesMap: UseQueryResult<Map<string, string>>;
   // Stable focus anchor in the table region, passed to each row's actions so
@@ -33,12 +28,6 @@ interface UsersTableProps {
   focusAnchorRef: RefObject<HTMLElement | null>;
 }
 
-// The Users table. Loading and live data share one table: while either query is
-// pending we render placeholder rows whose cells wrap their content in
-// <Skeleton loading>, so the shimmer is sized by the exact markup that renders
-// real users and the layout never jumps when data arrives. Error and empty are
-// gated on both queries — one inline error if either fails, one empty state once
-// both resolve with no users.
 export const UsersTable: FC<UsersTableProps> = ({
   usersQuery,
   rolesMap,
@@ -54,8 +43,6 @@ export const UsersTable: FC<UsersTableProps> = ({
     return <EmptyState message="No users found." />;
   }
 
-  // Real users once both queries resolve; otherwise placeholder sentinels that
-  // render as skeleton rows.
   const rows: (User | undefined)[] =
     usersQuery.isSuccess && rolesMap.isSuccess
       ? usersQuery.data.data

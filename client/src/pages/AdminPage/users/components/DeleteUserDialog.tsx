@@ -23,10 +23,6 @@ interface DeleteUserDialogProps {
   error?: boolean;
 }
 
-// Confirmation dialog for deleting a user, built on Radix Themes' AlertDialog so
-// it gets a focus trap, Escape-to-cancel, focus return on close, and
-// title/description labelling for free.
-//
 // The dialog's open state is controlled by the parent (rendered as a sibling of
 // the actions menu, not nested in it) and the Delete button is a plain button
 // rather than AlertDialog.Action: the parent decides when to close, so the
@@ -44,7 +40,7 @@ export const DeleteUserDialog: FC<DeleteUserDialogProps> = ({
 
   return (
     <AlertDialog.Root open={open} onOpenChange={onOpenChange}>
-      <AlertDialog.Content maxWidth="536px" onCloseAutoFocus={onCloseAutoFocus}>
+      <AlertDialog.Content maxWidth="400px" onCloseAutoFocus={onCloseAutoFocus}>
         <AlertDialog.Title>Delete user</AlertDialog.Title>
         <AlertDialog.Description>
           Are you sure? The user <strong>{fullName}</strong> will be permanently

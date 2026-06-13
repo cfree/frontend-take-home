@@ -6,11 +6,10 @@ import { UsersTable } from "./UsersTable";
 import { Box } from "@radix-ui/themes";
 
 interface UsersTableProps {
-  // Optional full-text term filtering the list server-side by name.
   search?: string;
 }
 
-// The Users table. A thin container that keeps a persistent results announcer
+// A thin container that keeps a persistent results announcer
 // mounted ahead of the table body, so a settled count is reliably reported to
 // assistive tech across the body's loading/empty/error transitions. The actual
 // rows (and those states) live in UsersTableContent.

@@ -30,7 +30,7 @@ describe("UsersTab", () => {
     expect(await screen.findByText("Administrator")).toBeInTheDocument();
   });
 
-  it("keeps the Edit user action disabled in the row actions menu", async () => {
+  it("offers Delete and no longer lists Edit in the row actions menu", async () => {
     const user = buildUser({ first: "Ada", last: "Lovelace" });
     server.use(http.get("/api/users", () => HttpResponse.json(pageOf([user]))));
 
@@ -41,10 +41,12 @@ describe("UsersTab", () => {
       screen.getByRole("button", { name: /actions for ada lovelace/i }),
     );
 
-    const editItem = await screen.findByRole("menuitem", {
-      name: /edit user/i,
-    });
-    expect(editItem).toHaveAttribute("aria-disabled", "true");
+    expect(
+      await screen.findByRole("menuitem", { name: /delete user/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("menuitem", { name: /edit user/i }),
+    ).not.toBeInTheDocument();
   });
 
   it("opens a confirmation dialog naming the user when Delete is selected", async () => {
@@ -285,7 +287,7 @@ describe("UsersTab", () => {
     await userEvent.keyboard("{Enter}");
 
     expect(
-      await screen.findByRole("menuitem", { name: /edit user/i }),
+      await screen.findByRole("menuitem", { name: /delete user/i }),
     ).toBeInTheDocument();
   });
 
@@ -318,8 +320,12 @@ describe("UsersTab", () => {
     expect(await screen.findByRole("alert")).toBeInTheDocument();
   });
 
-  it("shows a muted dash when a user's role can't be resolved", async () => {
-    const user = buildUser({ roleId: "unknown-role" });
+  it("leaves the role cell blank when a user's role can't be resolved", async () => {
+    const user = buildUser({
+      first: "Ada",
+      last: "Lovelace",
+      roleId: "unknown-role",
+    });
     server.use(
       http.get("/api/users", () => HttpResponse.json(pageOf([user]))),
       http.get("/api/roles", () => HttpResponse.json(pageOf([]))),
@@ -327,7 +333,11 @@ describe("UsersTab", () => {
 
     renderWithProviders(<UsersTab />);
 
-    expect(await screen.findByText("—")).toBeInTheDocument();
+    // The user still renders; an unresolved role simply leaves its cell blank,
+    // with no placeholder standing in for the missing name.
+    const row = await screen.findByRole("row", { name: /ada lovelace/i });
+    const cells = within(row).getAllByRole("cell");
+    expect(cells[1]).toHaveTextContent(/^$/);
   });
 
   it("formats each user's join date as MMM D, YYYY", async () => {
@@ -430,7 +440,7 @@ describe("UsersTab", () => {
     await userEvent.click(
       screen.getByRole("button", { name: /actions for ada lovelace/i }),
     );
-    await screen.findByRole("menuitem", { name: /edit user/i });
+    await screen.findByRole("menuitem", { name: /delete user/i });
 
     // The menu portals to document.body; scope axe to the menu subtree so the
     // assertion is about the menu's accessibility, not page-level landmarks.

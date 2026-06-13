@@ -16,16 +16,8 @@ import { RoleCell } from "./components/RoleCell";
 import { RoleRowActions } from "./components/RoleRowActions";
 import RowCell from "~/components/RowCell";
 
-// How many placeholder rows to show while loading — enough to read as "a table
-// is loading here" without dominating the viewport.
 const SKELETON_ROW_COUNT = 5;
 
-// The Roles tab: lists every role in a single table. Simpler than the Users tab
-// — no search, no pagination, one query — so the container folds in here rather
-// than splitting into a separate list wrapper. Loading and live data share one
-// table: while the query is pending we render placeholder rows whose cells wrap
-// their content in <Skeleton loading>, so the shimmer matches the real cells and
-// the layout never jumps when data arrives.
 export default function RolesTab() {
   const rolesQuery = useRoles();
 
@@ -37,17 +29,12 @@ export default function RolesTab() {
     return <EmptyState message="No roles found." />;
   }
 
-  // Real roles once the query resolves; otherwise placeholder sentinels that
-  // render as skeleton rows.
   const rows: (Role | undefined)[] = rolesQuery.isSuccess
     ? rolesQuery.data.data
     : Array.from({ length: SKELETON_ROW_COUNT }, () => undefined);
 
   return (
     <Box
-      // While loading, the table is a live status region named for assistive
-      // tech; Radix marks the skeleton content aria-hidden so only this label is
-      // announced. Once data resolves it's a plain container again.
       {...(!rolesQuery.isSuccess
         ? { role: "status", "aria-label": "Loading roles…" }
         : {})}

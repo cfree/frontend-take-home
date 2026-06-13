@@ -13,8 +13,7 @@ interface RoleRowActionsProps {
 
 // Per-row actions for a single role: composes the generic actions menu with the
 // rename dialog, owns the dialog's open state, and orchestrates the rename
-// mutation's outcome. Concentrating the role-specific wiring here keeps
-// RowActionsMenu reusable across row types.
+// mutation's outcome.
 export const RoleRowActions: FC<RoleRowActionsProps> = ({ role }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   // The name from the most recent attempt, so a duplicate-name error can quote

@@ -55,7 +55,7 @@ A pre-commit hook formats and lints staged files. A pre-push hook runs type chec
 - **Radix Themes** for accessible, prebuilt components.
 - **TanStack Query** for data fetching, caching, and retries.
 - **React Router** for managing the state in the URL.
-- **react-hook-form with Zod** for forms and validation.
+- **Zod** for validation.
 - **Vitest with Testing Library and vitest-axe** for unit tests and accessibility checks.
 - **ESLint, Prettier, and jsx-a11y** for code consistency and preventing accessibility issues.
 - **dayjs** for easy date formatting.

@@ -6,7 +6,6 @@ React 19 + Radix Themes, data via TanStack Query, routing via React Router 7. Va
 
 - **UI: Radix Themes.** Prefer its accessible primitives over hand-rolled components. Theme is configured in `src/main.tsx`.
 - **Routing: React Router 7.** Route tree in `src/routes.tsx`. The URL holds tab + search state — read state from the URL, don't shadow it in local component state.
-- **Forms: react-hook-form + Zod** via `@hookform/resolvers`.
 - **Import alias `~` → `./src`** (see `vite.config.ts`). Use it for cross-area imports; relative paths are fine within a folder.
 
 ## The data-fetch pattern (don't invent another)
