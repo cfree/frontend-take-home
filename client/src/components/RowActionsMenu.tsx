@@ -35,11 +35,12 @@ export const RowActionsMenu: FC<RowActionsMenuProps> = ({
           variant="ghost"
           color="gray"
           aria-label={label}
+          radius="full"
         >
-          <DotsHorizontalIcon radius="radius/full" />
+          <DotsHorizontalIcon />
         </IconButton>
       </DropdownMenu.Trigger>
-      <DropdownMenu.Content>
+      <DropdownMenu.Content side="bottom" align="end" sideOffset={4}>
         {actions.map((action) => (
           <DropdownMenu.Item
             key={action.label}

@@ -1,7 +1,7 @@
 import { useRef, useState, type FC, type RefObject } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { RowActionsMenu } from "~/components/RowActionsMenu";
-import { useToast } from "~/components/toast/ToastContext";
+import { useToast } from "~/components/toast/useToast";
 import { useDeleteUser } from "~/api/users/useDeleteUser";
 import { queryKeys } from "~/lib/queryKeys";
 import type { User } from "~/api/users/types";
@@ -70,7 +70,6 @@ export const UserRowActions: FC<UserRowActionsProps> = ({
         label={`Actions for ${fullName}`}
         triggerRef={triggerRef}
         actions={[
-          { label: "Edit user", disabled: true },
           {
             label: "Delete user",
             onSelect: () => {

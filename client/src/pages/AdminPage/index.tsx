@@ -15,8 +15,8 @@ export function AdminLayout() {
   const { pathname } = useLocation();
 
   return (
-    <Container size="2" p="6">
-      <Flex direction="column" gap="4">
+    <Container size="3" p="6">
+      <Flex direction="column" gap="5">
         <TabNav.Root aria-label="Admin sections">
           {TABS.map((tab) => (
             <TabNav.Link

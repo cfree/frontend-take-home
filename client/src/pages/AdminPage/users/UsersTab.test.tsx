@@ -62,9 +62,7 @@ describe("UsersTab", () => {
     );
 
     const dialog = await screen.findByRole("alertdialog");
-    expect(
-      within(dialog).getByText("Delete Ada Lovelace?"),
-    ).toBeInTheDocument();
+    expect(within(dialog).getByText("Ada Lovelace")).toBeInTheDocument();
   });
 
   it("closes the dialog and returns focus to the row trigger on Cancel", async () => {
@@ -137,7 +135,7 @@ describe("UsersTab", () => {
       await screen.findByRole("menuitem", { name: /delete user/i }),
     );
     await userEvent.click(
-      await screen.findByRole("button", { name: /^delete$/i }),
+      await screen.findByRole("button", { name: /^delete user$/i }),
     );
 
     // Success toast names the deleted user.
@@ -173,7 +171,7 @@ describe("UsersTab", () => {
       await screen.findByRole("menuitem", { name: /delete user/i }),
     );
     await userEvent.click(
-      await screen.findByRole("button", { name: /^delete$/i }),
+      await screen.findByRole("button", { name: /^delete user$/i }),
     );
 
     await waitFor(() =>
@@ -206,7 +204,7 @@ describe("UsersTab", () => {
       await screen.findByRole("menuitem", { name: /delete user/i }),
     );
     const deleteButton = await screen.findByRole("button", {
-      name: /^delete$/i,
+      name: /^delete user$/i,
     });
     await userEvent.click(deleteButton);
 
@@ -260,7 +258,7 @@ describe("UsersTab", () => {
       await screen.findByRole("menuitem", { name: /delete user/i }),
     );
     await userEvent.click(
-      await screen.findByRole("button", { name: /^delete$/i }),
+      await screen.findByRole("button", { name: /^delete user$/i }),
     );
 
     // Success fires and the refetch is in flight; the existing rows stay put and
@@ -471,7 +469,7 @@ describe("UsersTab", () => {
       await screen.findByRole("menuitem", { name: /delete user/i }),
     );
     await userEvent.click(
-      await screen.findByRole("button", { name: /^delete$/i }),
+      await screen.findByRole("button", { name: /^delete user$/i }),
     );
 
     expect(await screen.findByText("No users found.")).toBeInTheDocument();
@@ -502,7 +500,7 @@ describe("UsersTab", () => {
       await screen.findByRole("menuitem", { name: /delete user/i }),
     );
     await userEvent.click(
-      await screen.findByRole("button", { name: /^delete$/i }),
+      await screen.findByRole("button", { name: /^delete user$/i }),
     );
 
     // Treated as a benign success: warning toast, dialog closes, row reconciles
@@ -539,7 +537,7 @@ describe("UsersTab", () => {
       await screen.findByRole("menuitem", { name: /delete user/i }),
     );
     const deleteButton = await screen.findByRole("button", {
-      name: /^delete$/i,
+      name: /^delete user$/i,
     });
     await userEvent.click(deleteButton);
 
@@ -576,7 +574,7 @@ describe("UsersTab", () => {
       await screen.findByRole("menuitem", { name: /delete user/i }),
     );
     const deleteButton = await screen.findByRole("button", {
-      name: /^delete$/i,
+      name: /^delete user$/i,
     });
     await userEvent.click(deleteButton);
 
@@ -607,7 +605,7 @@ describe("UsersTab", () => {
       await screen.findByRole("menuitem", { name: /delete user/i }),
     );
     await userEvent.click(
-      await screen.findByRole("button", { name: /^delete$/i }),
+      await screen.findByRole("button", { name: /^delete user$/i }),
     );
 
     const dialog = screen.getByRole("alertdialog");

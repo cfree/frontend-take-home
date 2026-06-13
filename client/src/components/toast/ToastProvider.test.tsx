@@ -3,7 +3,8 @@ import userEvent from "@testing-library/user-event";
 import { axe } from "vitest-axe";
 
 import { renderWithProviders, screen, waitFor } from "~/test/utils";
-import { useToast, type ToastVariant } from "./ToastContext";
+import { type ToastVariant } from "./ToastContext";
+import { useToast } from "./useToast";
 
 // A minimal in-test consumer: fires a toast when its button is clicked, so the
 // toast system is exercised through its public hook the way a feature would use

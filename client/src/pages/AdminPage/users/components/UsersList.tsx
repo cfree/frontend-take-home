@@ -3,6 +3,7 @@ import { useUsers } from "~/api/users/useUsers";
 import { useRolesMap } from "~/api/roles/useRoles";
 import { ResultsAnnouncer } from "~/components/ResultsAnnouncer";
 import { UsersTable } from "./UsersTable";
+import { Box } from "@radix-ui/themes";
 
 interface UsersTableProps {
   // Optional full-text term filtering the list server-side by name.
@@ -32,7 +33,7 @@ export const UsersList: FC<UsersTableProps> = ({ search }) => {
   return (
     <>
       <ResultsAnnouncer count={settledCount} noun="user" />
-      <div
+      <Box
         ref={focusAnchorRef}
         role="region"
         aria-label="Users table"
@@ -44,7 +45,7 @@ export const UsersList: FC<UsersTableProps> = ({ search }) => {
           rolesMap={rolesMap}
           focusAnchorRef={focusAnchorRef}
         />
-      </div>
+      </Box>
     </>
   );
 };

@@ -47,19 +47,22 @@ export default function UsersTab() {
   }
 
   return (
-    <Flex direction="column" gap="4">
-      <Flex justify="between" align="center" gap="3">
-        <Box width="320px" maxWidth="100%">
-          <SearchInput
-            value={inputValue}
-            onChange={handleSearchChange}
-            label="Search users by name"
-            placeholder="Search by name…"
-          />
-        </Box>
-        <Box flexShrink="0" />
-      </Flex>
-      <UsersList search={committedSearch} />
-    </Flex>
+    <>
+      <header>
+        <Flex justify="between" align="center" gap="2">
+          <Box flexGrow="1">
+            <SearchInput
+              value={inputValue}
+              onChange={handleSearchChange}
+              label="Search users by name"
+              placeholder="Search by name…"
+            />
+          </Box>
+        </Flex>
+      </header>
+      <main>
+        <UsersList search={committedSearch} />
+      </main>
+    </>
   );
 }

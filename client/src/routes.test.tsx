@@ -61,8 +61,11 @@ describe("admin routing", () => {
   it("renders the Roles screen in the layout outlet", () => {
     renderWithProviders(<AppRoutes />, { route: "/roles" });
 
+    // The roles table's loading status is distinctive to the Roles screen (the
+    // Users screen has none), so finding it confirms that route rendered into
+    // the outlet. It's present synchronously on the first, still-pending render.
     expect(
-      screen.getByText(/role management is coming soon/i),
+      screen.getByRole("status", { name: /loading roles/i }),
     ).toBeInTheDocument();
   });
 

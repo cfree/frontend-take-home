@@ -44,11 +44,11 @@ export const DeleteUserDialog: FC<DeleteUserDialogProps> = ({
 
   return (
     <AlertDialog.Root open={open} onOpenChange={onOpenChange}>
-      <AlertDialog.Content maxWidth="450px" onCloseAutoFocus={onCloseAutoFocus}>
-        <AlertDialog.Title>Delete {fullName}?</AlertDialog.Title>
+      <AlertDialog.Content maxWidth="536px" onCloseAutoFocus={onCloseAutoFocus}>
+        <AlertDialog.Title>Delete user</AlertDialog.Title>
         <AlertDialog.Description>
-          This will permanently remove {fullName} from your organization. This
-          can't be undone.
+          Are you sure? The user <strong>{fullName}</strong> will be permanently
+          deleted.
         </AlertDialog.Description>
 
         {error && (
@@ -60,7 +60,7 @@ export const DeleteUserDialog: FC<DeleteUserDialogProps> = ({
         <Flex gap="3" mt="4" justify="end">
           <AlertDialog.Cancel>
             <Button
-              variant="soft"
+              variant="outline"
               color="gray"
               aria-disabled={pending}
               onClick={(event) => {
@@ -73,6 +73,7 @@ export const DeleteUserDialog: FC<DeleteUserDialogProps> = ({
             </Button>
           </AlertDialog.Cancel>
           <Button
+            variant="outline"
             color="red"
             aria-disabled={pending}
             aria-busy={pending}
@@ -83,7 +84,7 @@ export const DeleteUserDialog: FC<DeleteUserDialogProps> = ({
             }}
           >
             <Spinner loading={pending} />
-            Delete
+            Delete user
           </Button>
         </Flex>
       </AlertDialog.Content>
